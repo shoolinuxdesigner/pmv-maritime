@@ -532,7 +532,7 @@ export default function DashboardPage() {
 
 
           {/* Analytics Chart Container: 2 Distinct Visual Tabs with Filters & Responsive H-Scroll */}
-          <div className="bg-white border border-gray-200 p-5 shadow-xs space-y-4">
+          <div className="bg-white border border-gray-200 p-2 sm:p-5 shadow-xs space-y-4">
             {/* Header with 2 Tabs */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-gray-100 gap-3">
               <div className="flex items-center gap-2.5">
@@ -558,27 +558,27 @@ export default function DashboardPage() {
               </div>
 
               {/* Working 2-Tab Navigation */}
-              <div className="flex items-center gap-1 bg-slate-100 p-1 border border-gray-200 text-xs font-bold shrink-0 self-start sm:self-auto">
+              <div className="w-full sm:w-fit flex items-center gap-1 bg-slate-100 p-1 border border-gray-200 text-xs font-bold shrink-0 self-start sm:self-auto">
                 <button
                   type="button"
                   onClick={() => setActiveChartTab("bar")}
-                  className={`px-3 py-1.5 transition-all flex items-center gap-1.5 cursor-pointer ${activeChartTab === "bar"
+                  className={`h-[stretch] self-stretch w-full sm:w-fit px-3 py-1.5 transition-all flex items-center gap-1.5 cursor-pointer ${activeChartTab === "bar"
                     ? "bg-white text-secondary shadow-xs font-black"
                     : "text-gray-600 hover:text-gray-900"
                     }`}
                 >
-                  <LuChartBar className="text-sm" />
+                  <LuChartBar className="hidden sm:inline-block text-sm" />
                   <span>Category Bar Chart</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveChartTab("trend")}
-                  className={`px-3 py-1.5 transition-all flex items-center gap-1.5 cursor-pointer ${activeChartTab === "trend"
+                  className={`h-[stretch] self-stretch w-full sm:w-fit px-3 py-1.5 transition-all flex items-center gap-1.5 cursor-pointer ${activeChartTab === "trend"
                     ? "bg-white text-secondary shadow-xs font-black"
                     : "text-gray-600 hover:text-gray-900"
                     }`}
                 >
-                  <LuTrendingUp className="text-sm" />
+                  <LuTrendingUp className="hidden sm:inline-block text-sm" />
                   <span>Annual Contact Types</span>
                 </button>
               </div>
@@ -1077,7 +1077,7 @@ export default function DashboardPage() {
                       <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">
                         Annual Contact Volume by Category ({selectedYear})
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                      <div className="grid grid-cols-5 sm:grid-cols-4 lg:grid-cols-7 gap-2">
                         {ANNUAL_CONTACT_TYPES.map((t) => {
                           const count = yearlyTotalsByType[t.key] || 0;
                           const pct = totalYearContacts > 0 ? Math.round((count / totalYearContacts) * 100) : 0;
@@ -1113,7 +1113,7 @@ export default function DashboardPage() {
 
 
           {/* Table: Recent Customer & Vessel Inquiries Stream */}
-          <div className="bg-white border border-gray-200 p-5 shadow-xs">
+          <div className="bg-white border border-gray-200 p-2 sm:p-5 shadow-xs">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 gap-3 mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-secondary/10 border border-secondary/20 text-secondary flex items-center justify-center">
