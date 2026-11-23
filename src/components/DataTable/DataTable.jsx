@@ -26,6 +26,7 @@ export default function DataTable({
   title = "Data Submissions",
   detailTitle,
   renderDrawerDetail,
+  showViewButton = true,
   exportFilename = "data_export.csv",
   searchPlaceholder = "Search records...",
   reorderable = false,
@@ -364,7 +365,7 @@ export default function DataTable({
                       {col.header}
                     </th>
                   ))}
-                  <th className="px-5 py-3.5 font-bold text-right">View</th>
+                  {showViewButton && <th className="px-5 py-3.5 font-bold text-right">View</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-sm">
@@ -405,16 +406,18 @@ export default function DataTable({
                       ))}
 
                       {/* View Button */}
-                      <td className="px-5 py-3 align-top text-right whitespace-nowrap">
-                        <button
-                          id={rowIdx === 0 ? "datatable-first-row-view-btn" : undefined}
-                          onClick={() => openDrawer(row)}
-                          className="p-1.5 bg-slate-100 hover:bg-secondary hover:text-white text-secondary-dark border border-secondary transition-colors cursor-pointer"
-                          title="View Full Details"
-                        >
-                          <LuEye className="text-sm" />
-                        </button>
-                      </td>
+                      {showViewButton && (
+                        <td className="px-5 py-3 align-top text-right whitespace-nowrap">
+                          <button
+                            id={rowIdx === 0 ? "datatable-first-row-view-btn" : undefined}
+                            onClick={() => openDrawer(row)}
+                            className="p-1.5 bg-slate-100 hover:bg-secondary hover:text-white text-secondary-dark border border-secondary transition-colors cursor-pointer"
+                            title="View Full Details"
+                          >
+                            <LuEye className="text-sm" />
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   );
                 })}

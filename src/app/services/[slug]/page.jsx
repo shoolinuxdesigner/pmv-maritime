@@ -52,6 +52,7 @@ import {
 import { MdOutlineAnchor } from "react-icons/md";
 import ContactUs from "@/components/Contact Us/page";
 import toast from "react-hot-toast";
+import { getDirectDownloadUrl } from "@/lib/utils";
 
 // ─── STATIC SECTIONS (same for every service) ────────────────────────────────
 
@@ -133,18 +134,48 @@ export default function ServiceDetailPage() {
     return () => clearInterval(timer);
   }, [resendCooldown]);
 
-  const handleOpenBrochure = (url) => {
-    const targetUrl = url || service?.brochureUrl || "/docs/services.pdf";
-    if (targetUrl.startsWith("http://") || targetUrl.startsWith("https://")) {
-      window.open(targetUrl, "_blank", "noopener,noreferrer");
-    } else {
+  const handleDownloadBrochure = (url) => {
+    const rawTarget = (url || verifiedDownloadUrl || service?.brochureUrl || "").trim();
+    const safeFileName = `${(service?.name || "PMV-Maritime-Service")
+      .replace(/[^a-zA-Z0-9_\s-]/g, "")
+      .trim()
+      .replace(/\s+/g, "_")}-Brochure.pdf`;
+
+    // 1. If it's a local static or uploaded file (e.g. /docs/services.pdf)
+    if (rawTarget.startsWith("/") && !rawTarget.startsWith("//")) {
       const link = document.createElement("a");
-      link.href = targetUrl;
-      link.download = `${service?.name || "PMV-Maritime-Service"}-Brochure.pdf`;
+      link.href = rawTarget;
+      link.setAttribute("download", safeFileName);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      toast.success("Brochure download started!");
+      return;
     }
+
+    // 2. Direct download endpoint via backend proxy to ensure the browser downloads the PDF directly
+    // without opening any new tab or navigating away from the current page
+    const downloadEndpoint = `/api/brochure/download?slug=${encodeURIComponent(slug)}${rawTarget ? `&url=${encodeURIComponent(rawTarget)}` : ""
+      }`;
+
+    try {
+      const link = document.createElement("a");
+      link.href = downloadEndpoint;
+      link.setAttribute("download", safeFileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch {
+      let dlIframe = document.getElementById("hidden-brochure-downloader");
+      if (!dlIframe) {
+        dlIframe = document.createElement("iframe");
+        dlIframe.id = "hidden-brochure-downloader";
+        dlIframe.style.display = "none";
+        document.body.appendChild(dlIframe);
+      }
+      dlIframe.src = downloadEndpoint;
+    }
+    toast.success("Brochure download started!");
   };
 
   const validateField = (field, value) => {
@@ -264,10 +295,10 @@ export default function ServiceDetailPage() {
       setBrochureStep("success");
       setIsConverting(true);
 
-      // After 1.2s loader, automatically trigger opening/downloading the PDF
+      // After 1.2s loader, automatically trigger downloading the PDF directly
       setTimeout(() => {
         setIsConverting(false);
-        handleOpenBrochure(dlUrl);
+        handleDownloadBrochure(dlUrl);
       }, 1200);
     } catch (err) {
       setOtpError(err.message || "Verification failed. Please check the code.");
@@ -354,12 +385,12 @@ export default function ServiceDetailPage() {
                 {isVerified ? (
                   <button
                     type="button"
-                    onClick={() => handleOpenBrochure(verifiedDownloadUrl || service?.brochureUrl)}
-                    className="group w-full md:w-fit justify-center text-[16px] md:text-[14px] flex gap-3 items-center pl-3 md:pl-4 pr-2 md:pr-3 py-1.5 md:py-2 bg-primary hover:bg-primary-hover text-white font-bold tracking-wider shadow-lg cursor-pointer transition-all"
+                    onClick={() => handleDownloadBrochure(verifiedDownloadUrl || service?.brochureUrl)}
+                    className="group w-full md:w-fit justify-center text-[16px] md:text-[14px] flex gap-3 items-center pl-3 md:pl-4 pr-2 md:pr-3 py-1.5 md:py-2 bg-white hover:bg-primary-hover text-primary hover:text-white font-bold tracking-wider shadow-lg cursor-pointer transition-all"
                     title="Download Service Brochure"
                   >
                     <PiDownloadSimpleBold className="text-lg" />
-                    Download PDF
+                    Download Again
                   </button>
                 ) : (
                   <button
@@ -564,12 +595,12 @@ export default function ServiceDetailPage() {
             }}
           />
 
-          <div className="relative w-full max-w-lg bg-white border border-gray-200 shadow-2xl z-10 overflow-hidden flex flex-col">
+          <div className="relative w-full max-w-lg bg-white border border-gray-200 z-10 overflow-hidden flex flex-col">
             {/* Header Accent Bar */}
-            <div className="h-1.5 w-full bg-primary" />
+            <div className="h-1.5 w-full bg-secondary-dark mb-1" />
 
             {/* Modal Header */}
-            <div className="flex items-start justify-between p-5 md:p-6 border-b border-gray-200 bg-[#f7f5f8]">
+            <div className="flex items-start justify-between p-3 md:px-6 md:py-4 border-b border-gray-200 bg-[#f7f5f8]">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shrink-0">
                   <LuFileText className="h-5 w-5" />
@@ -599,13 +630,10 @@ export default function ServiceDetailPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 md:p-6">
+            <div className="p-3 md:px-6 md:pt-4 md:pb-3">
               {/* ── PHASE 1: LEAD FORM ───────────────────────────────────────── */}
               {brochureStep === "form" && (
                 <form onSubmit={handleSendOtp} noValidate className="space-y-4">
-                  <p className="text-xs text-gray-600 leading-relaxed font-medium">
-                    Please provide your contact details below. A 6-digit verification code will be sent to your email to verify and unlock the brochure download.
-                  </p>
 
                   {/* Full Name */}
                   <div>
@@ -689,7 +717,7 @@ export default function ServiceDetailPage() {
                   </div>
 
                   {/* Submit Button */}
-                  <div className="pt-2">
+                  <div className="pt-2 mb-2">
                     <button
                       type="submit"
                       disabled={isSendingOtp}
@@ -818,7 +846,7 @@ export default function ServiceDetailPage() {
 
               {/* ── PHASE 3: VERIFICATION SUCCESS & CONVERTED DOWNLOAD BUTTON ── */}
               {brochureStep === "success" && (
-                <div className="text-center py-4 space-y-5">
+                <div className="text-center space-y-5">
                   <div className="w-16 h-16 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-full flex items-center justify-center mx-auto text-3xl">
                     <TbCheck className="stroke-[3]" />
                   </div>
@@ -841,7 +869,7 @@ export default function ServiceDetailPage() {
                   ) : (
                     <button
                       type="button"
-                      onClick={() => handleOpenBrochure(verifiedDownloadUrl)}
+                      onClick={() => handleDownloadBrochure(verifiedDownloadUrl)}
                       className="w-full py-3.5 bg-primary hover:bg-primary-hover text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <PiDownloadSimpleBold className="text-lg" />
@@ -850,7 +878,7 @@ export default function ServiceDetailPage() {
                   )}
 
                   <p className="text-[11px] text-gray-400">
-                    If your download does not open automatically, click the button above.
+                    If your download does not start automatically, click the button above.
                   </p>
                 </div>
               )}

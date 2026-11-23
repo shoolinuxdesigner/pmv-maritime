@@ -3,8 +3,6 @@ import clientPromise from "@/lib/mongodb";
 import { SYSTEM_ROLES } from "@/lib/permissions";
 import { hashPassword } from "@/lib/authCrypto";
 import crypto from "crypto";
-import { getTransporter } from "@/lib/nodemailer";
-import { generateUserCredentialsEmailHTML } from "@/lib/emailTemplate";
 
 export const dynamic = "force-dynamic";
 
@@ -120,29 +118,9 @@ export async function POST(request) {
       createdAt: new Date().toISOString(),
     });
 
-    // Automatically send welcome invitation email directing to set password
-    try {
-      const transporter = getTransporter();
-      const emailHtml = generateUserCredentialsEmailHTML({
-        fullName: newUser.fullName,
-        email: newUser.email,
-        loginUrl: "https://pmvmaritime.com/admin",
-      });
-
-      const smtpUser = process.env.SMTP_USER;
-      await transporter.sendMail({
-        from: `"PMV Maritime Solutions" <${smtpUser}>`,
-        to: newUser.email,
-        subject: "Welcome to PMV Maritime Solutions Admin Portal",
-        html: emailHtml,
-      });
-    } catch (mailErr) {
-      console.error("Welcome invitation email dispatch error:", mailErr);
-    }
-
     return NextResponse.json({
       success: true,
-      message: `User ${newUser.fullName} created successfully. An activation invitation was dispatched to ${newUser.email}.`,
+      message: `User ${newUser.fullName} created successfully.`,
       insertedId: result.insertedId.toString(),
     });
   } catch (error) {

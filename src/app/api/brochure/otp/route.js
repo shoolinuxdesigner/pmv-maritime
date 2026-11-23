@@ -3,6 +3,7 @@ import clientPromise from "@/lib/mongodb";
 import { generateNumericOTP, hashOTP, verifyPassword } from "@/lib/authCrypto";
 import { getTransporter } from "@/lib/nodemailer";
 import { generateBrochureOtpEmailHTML } from "@/lib/emailTemplate";
+import { getDirectDownloadUrl } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -67,6 +68,32 @@ export async function POST(request) {
       const otpHash = await hashOTP(otp);
       const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
+      // Format submission date & time string
+      const dateTimeStr = new Date().toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+
+      // Insert tracking record into `queries` collection for Admin review
+      const queryInsert = await db.collection("queries").insertOne({
+        fullName: fullName.trim(),
+        phone: phone.trim(),
+        email: normalizedEmail,
+        serviceName: (serviceName || "PMV Maritime Service").trim(),
+        serviceSlug: (serviceSlug || "").trim(),
+        sourceUrl: `/services/${(serviceSlug || "").trim()}`,
+        status: "pending", // pending until verified; marked failed if expired or max attempts
+        verified: false,
+        archived: false,
+        expiresAt,
+        createdAt: new Date(),
+        dateTime: dateTimeStr,
+      });
+
       await db.collection("brochure_otps").insertOne({
         email: normalizedEmail,
         fullName: fullName.trim(),
@@ -76,6 +103,7 @@ export async function POST(request) {
         otpHash,
         attempts: 0,
         verified: false,
+        queryId: queryInsert.insertedId,
         expiresAt,
         createdAt: new Date(),
       });
@@ -148,6 +176,12 @@ export async function POST(request) {
           { _id: otpRecord._id },
           { $set: { invalidatedReason: "MAX_ATTEMPTS_EXCEEDED" } }
         );
+        if (otpRecord.queryId) {
+          await db.collection("queries").updateOne(
+            { _id: otpRecord.queryId },
+            { $set: { status: "failed", failedReason: "Max attempts exceeded" } }
+          );
+        }
         return NextResponse.json(
           { error: "Too many incorrect attempts. Please request a new verification code." },
           { status: 400 }
@@ -157,10 +191,17 @@ export async function POST(request) {
       // Verify OTP hash
       const isValid = await verifyPassword(cleanOtp, otpRecord.otpHash);
       if (!isValid) {
+        const nextAttempts = (otpRecord.attempts || 0) + 1;
         await db.collection("brochure_otps").updateOne(
           { _id: otpRecord._id },
           { $inc: { attempts: 1 } }
         );
+        if (nextAttempts >= 5 && otpRecord.queryId) {
+          await db.collection("queries").updateOne(
+            { _id: otpRecord.queryId },
+            { $set: { status: "failed", failedReason: "Max attempts exceeded" } }
+          );
+        }
         return NextResponse.json(
           { error: "Incorrect verification code. Please double-check and try again." },
           { status: 400 }
@@ -172,6 +213,19 @@ export async function POST(request) {
         { _id: otpRecord._id },
         { $set: { verified: true, verifiedAt: new Date() } }
       );
+
+      // Update tracking record in `queries` collection
+      if (otpRecord.queryId) {
+        await db.collection("queries").updateOne(
+          { _id: otpRecord.queryId },
+          { $set: { status: "verified", verified: true, verifiedAt: new Date() } }
+        );
+      } else {
+        await db.collection("queries").updateMany(
+          { email: normalizedEmail, serviceSlug: otpRecord.serviceSlug, status: "pending" },
+          { $set: { status: "verified", verified: true, verifiedAt: new Date() } }
+        );
+      }
 
       // Record lead in brochure_leads
       await db.collection("brochure_leads").insertOne({
@@ -203,12 +257,14 @@ export async function POST(request) {
 
       // Fetch the service's brochureUrl from MongoDB
       const service = await db.collection("services").findOne({ slug: otpRecord.serviceSlug });
-      const downloadUrl = (service?.brochureUrl || "").trim() || "/docs/services.pdf";
+      const rawBrochureUrl = (service?.brochureUrl || "").trim() || "/docs/services.pdf";
+      const downloadUrl = getDirectDownloadUrl(rawBrochureUrl);
 
       return NextResponse.json({
         success: true,
         verified: true,
         downloadUrl,
+        rawBrochureUrl,
         serviceName: otpRecord.serviceName,
         message: "Verification successful! Starting your brochure download...",
       });

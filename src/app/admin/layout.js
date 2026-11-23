@@ -36,6 +36,7 @@ import {
   LuKey,
 } from "react-icons/lu";
 import { RiLockPasswordLine } from "react-icons/ri";
+import { TbBrandGoogleBigQuery } from "react-icons/tb";
 
 import logo from "../../../public/assets/images/logo.png";
 import image1 from "../../../public/assets/images/about-image-1.jpg";
@@ -77,6 +78,7 @@ const NAV_ITEMS = [
     icon: LuFileText,
     children: [
       { key: "contact", label: "Contact Us", href: "/admin/contact", icon: LuMail },
+      { key: "queries", label: "General Queries", href: "/admin/queries", icon: TbBrandGoogleBigQuery },
     ],
   },
   {
@@ -108,6 +110,7 @@ const PAGE_TITLES = {
   careers: "Careers",
   faqs: "FAQs",
   contact: "Contact",
+  queries: "General Queries",
   notifications: "Activity Center",
   users: "User Management",
   sessions: "Sessions",

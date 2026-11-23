@@ -61,9 +61,15 @@ export default function MasterPage() {
   }, []);
 
   useEffect(() => {
+    let ignore = false;
     if (activeTab === "system") {
-      void fetchMaintenanceSystemInfo();
+      Promise.resolve().then(() => {
+        if (!ignore) fetchMaintenanceSystemInfo();
+      });
     }
+    return () => {
+      ignore = true;
+    };
   }, [activeTab, fetchMaintenanceSystemInfo]);
 
   const handleToggleLiveMaintenance = async (targetState) => {
@@ -270,7 +276,7 @@ export default function MasterPage() {
   useEffect(() => {
     let ignore = false;
     Promise.resolve().then(() => {
-      if (!ignore) void fetchMasterRecords();
+      if (!ignore) fetchMasterRecords();
     });
     return () => {
       ignore = true;

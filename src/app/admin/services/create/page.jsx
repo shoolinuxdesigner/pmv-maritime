@@ -327,8 +327,8 @@ export default function CreateServicePage() {
                 ? "Updating..."
                 : "Publishing..."
               : editId
-                ? "Update Service"
-                : "Save & Publish Service"}
+                ? "Update"
+                : "Publish"}
           </button>
         </div>
       </div>
@@ -630,8 +630,8 @@ export default function CreateServicePage() {
                 ? "Updating..."
                 : "Publishing..."
               : editId
-                ? "Update Service"
-                : "Save & Publish Service"}
+                ? "Update"
+                : "Publish"}
           </button>
         </div>
       </form>
