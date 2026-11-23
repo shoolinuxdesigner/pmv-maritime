@@ -18,6 +18,15 @@ import member2 from "../../../public/assets/members/member2.png";
 import member3 from "../../../public/assets/members/member3.png";
 import member4 from "../../../public/assets/members/member4.png";
 import member5 from "../../../public/assets/members/member5.png";
+import newMember1 from "../../../public/assets/members/new-member-1.png";
+import newMember2 from "../../../public/assets/members/new-member-2.png";
+import newMember3 from "../../../public/assets/members/new-member-3.png";
+import newMember4 from "../../../public/assets/members/new-member-4.png";
+import newMember5 from "../../../public/assets/members/new-member-5.png";
+import newMember6 from "../../../public/assets/members/new-member-6.png";
+import newMember7 from "../../../public/assets/members/new-member-7.png";
+import newMember8 from "../../../public/assets/members/new-member-8.png";
+import newMember9 from "../../../public/assets/members/new-member-9.png";
 
 const directionImages = [image1, image2, image3];
 
@@ -34,11 +43,114 @@ import GallerySection from "@/components/GallerySection/page";
 import ContactUs from "@/components/Contact Us/page";
 
 const teamMembers = [
+  // {
+  //   name: "Dr Ade Dosunmu, MON",
+  //   role: "Director",
+  //   image: member1,
+  //   description: "Dr Ade Dosunmu is an accomplished maritime administrator, public policy expert and academic with extensive experience in maritime governance, public administration and institutional leadership. A former Director-General/Chief Executive Officer of NIMASA, he has represented Nigeria at international maritime and labour forums, including the IMO and ILO. With a doctorate in Public Administration and extensive executive-level experience, he brings a strong combination of maritime knowledge, policy expertise and strategic leadership to the organisation.",
+  //   expertise: [
+  //     "Maritime Administration & Governance",
+  //     "Maritime Policy & Regulatory Affairs",
+  //     "Public Policy & Administration",
+  //     "Strategic Leadership & Institutional Development",
+  //     "Corporate Governance & Administration",
+  //     "International Maritime Relations",
+  //     "Government & Stakeholder Relations",
+  //     "Shipping, Transport & Logistics"
+  //   ],
+  //   socials: {
+  //     email: "info@pmvmaritime.com",
+  //     linkedin: "https://www.linkedin.com/in/dr-ade-dosunmu-234977131",
+  //     x: "https://x.com/dradedosunmu23"
+  //   }
+  // },
+  // {
+  //   name: "Capt. Gaurav Chhabra",
+  //   role: "Global Head - Maritime Strategy & Innovation",
+  //   image: member2,
+  //   description: "Capt. Gaurav Chhabra is a Master Mariner with over 20 years of global maritime experience spanning seagoing operations, maritime training, simulation, business development and digital innovation. His career combines practical shipboard experience with shore-based leadership and technology-driven maritime education. With a strong focus on operational excellence, training development and innovation, he brings practical maritime knowledge and a forward-looking approach to developing effective solutions for the evolving needs of the maritime industry.",
+  //   expertise: [
+  //     "Maritime Operations",
+  //     "Maritime Training & Simulation",
+  //     "Digital Innovation & Transformation",
+  //     "Business Development",
+  //     "Strategic Leadership",
+  //     "Maritime Education & Training Development",
+  //     "Technology-Enabled Learning",
+  //     "Sea-to-Shore Operations"
+  //   ],
+  //   socials: {
+  //     email: "info@pmvmaritime.com",
+  //     linkedin: "https://www.linkedin.com/in/gaurav-chhabra-658948213",
+  //   }
+  // },
+  // {
+  //   name: "Capt. Duryodhan Tarai",
+  //   role: "Global Head of Offshore & Marine Operations",
+  //   image: member3,
+  //   description: "Capt. Duryodhan Tarai is an experienced maritime professional with extensive expertise in offshore operations, vessel management and marine assurance. His career includes command of Dive Support Vessels (DSVs) as Master, followed by senior shore-based assignments with ADNOC Offshore and Saudi Aramco. His experience encompasses complex offshore operations, Dynamic Positioning (DP) trials, vessel inspections, marine and offshore surveys, Marine Warranty Surveys, project risk assessment and regulatory compliance. He brings a strong combination of practical command experience, technical expertise and operational leadership to the organisation.",
+  //   expertise: [
+  //     "Offshore & Marine Operations",
+  //     "Vessel Management & Operations",
+  //     "Dynamic Positioning (DP) Operations & Trials",
+  //     "Dive Support Vessel (DSV) Operations",
+  //     "Marine & Offshore Surveys",
+  //     "Marine Warranty Surveys",
+  //     "Vessel Inspection & Compliance",
+  //     "Offshore Project Execution & Risk Assessment",
+  //     "Marine Safety & Operational Assurance"
+  //   ],
+  //   socials: {
+  //     email: "info@pmvmaritime.com",
+  //     linkedin: "https://www.linkedin.com/in/capt-duryodhan-tarai-18205068",
+  //   }
+  // },
+  // {
+  //   name: "Mr. Saswat Ranjan Barik",
+  //   role: "Head - Marine Personnel & Commercial Operations, Nigeria",
+  //   image: member4,
+  //   description: "Mr. Saswat Ranjan Barik is an experienced maritime professional, Master Mariner and certified Lead Auditor with nearly two decades of experience across marine operations, crew management, regulatory compliance, quality assurance, maritime training and commercial operations. His experience combines practical seagoing knowledge with shore-based leadership in India and Nigeria. With expertise in international maritime regulations and quality management systems, he leads marine personnel and commercial operations while supporting regulatory compliance, operational excellence and sustainable business growth within the organisation.",
+  //   expertise: [
+  //     "Marine Personnel & Crew Management",
+  //     "Commercial & Marine Operations",
+  //     "Maritime Regulatory Compliance",
+  //     "ISO 9001 & ISO 17025 Quality Management Systems",
+  //     "Maritime Audits & Inspections",
+  //     "STCW & MLC 2006 Compliance",
+  //     "ISM, ISPS & MARPOL Compliance",
+  //     "Maritime Training & Accreditation",
+  //     "Port & Marine Operations",
+  //     "Business Development & Operational Strategy"
+  //   ],
+  //   socials: {
+  //     email: "saswat@pmvmaritime.com"
+  //   }
+  // },
+  // {
+  //   name: "Capt. Iftikhar Khan",
+  //   role: "Maritime Security & Commercial Operations - UK",
+  //   image: member5,
+  //   description: "Capt. Iftikhar Khan is an accomplished maritime professional and Master Mariner with extensive international experience across ship operations, commercial shipping, maritime security and business development. Combining a strong seafaring background with senior shore-based leadership, his expertise spans voyage management, marine operations, security and risk management, commercial development and maritime education. His operational knowledge and leadership experience support the organisation's commitment to safe, secure and efficient maritime services and sustainable business growth.",
+  //   expertise: [
+  //     "Maritime Security & Risk Management",
+  //     "Commercial Shipping Operations",
+  //     "Ship & Marine Operations",
+  //     "Voyage Management",
+  //     "Business Development",
+  //     "Maritime Safety & Operational Management",
+  //     "Maritime Education",
+  //     "Strategic Leadership"
+  //   ],
+  //   socials: {
+  //     email: "info@pmvmaritime.com"
+  //   }
+  // },
   {
     name: "Dr Ade Dosunmu, MON",
     role: "Director",
-    image: member1,
-    description: "Dr Ade Dosunmu is an accomplished maritime administrator, public policy expert and academic with extensive experience in maritime governance, public administration and institutional leadership. A former Director-General/Chief Executive Officer of NIMASA, he has represented Nigeria at international maritime and labour forums, including the IMO and ILO. With a doctorate in Public Administration and extensive executive-level experience, he brings a strong combination of maritime knowledge, policy expertise and strategic leadership to the organisation.",
+    image: newMember1,
+    description:
+      "Dr Ade Dosunmu is an accomplished maritime administrator, public policy expert and academic with extensive experience in maritime governance, public administration and institutional leadership. A former Director-General/Chief Executive Officer of NIMASA, he has represented Nigeria at international maritime and labour forums, including the IMO and ILO. With a doctorate in Public Administration and extensive executive-level experience, he brings a strong combination of maritime knowledge, policy expertise and strategic leadership to the organisation.",
     expertise: [
       "Maritime Administration & Governance",
       "Maritime Policy & Regulatory Affairs",
@@ -47,19 +159,19 @@ const teamMembers = [
       "Corporate Governance & Administration",
       "International Maritime Relations",
       "Government & Stakeholder Relations",
-      "Shipping, Transport & Logistics"
+      "Shipping, Transport & Logistics",
     ],
     socials: {
-      email: "info@pmvmaritime.com",
       linkedin: "https://www.linkedin.com/in/dr-ade-dosunmu-234977131",
       x: "https://x.com/dradedosunmu23"
-    }
+    },
   },
   {
     name: "Capt. Gaurav Chhabra",
     role: "Global Head - Maritime Strategy & Innovation",
-    image: member2,
-    description: "Capt. Gaurav Chhabra is a Master Mariner with over 20 years of global maritime experience spanning seagoing operations, maritime training, simulation, business development and digital innovation. His career combines practical shipboard experience with shore-based leadership and technology-driven maritime education. With a strong focus on operational excellence, training development and innovation, he brings practical maritime knowledge and a forward-looking approach to developing effective solutions for the evolving needs of the maritime industry.",
+    image: newMember2,
+    description:
+      "Capt. Gaurav Chhabra is a Master Mariner with over 20 years of global maritime experience spanning seagoing operations, maritime training, simulation, business development and digital innovation. His career combines practical shipboard experience with shore-based leadership and technology-driven maritime education. With a strong focus on operational excellence, training development and innovation, he brings practical maritime knowledge and a forward-looking approach to developing effective solutions for the evolving needs of the maritime industry.",
     expertise: [
       "Maritime Operations",
       "Maritime Training & Simulation",
@@ -68,18 +180,19 @@ const teamMembers = [
       "Strategic Leadership",
       "Maritime Education & Training Development",
       "Technology-Enabled Learning",
-      "Sea-to-Shore Operations"
+      "Sea-to-Shore Operations",
     ],
     socials: {
       email: "info@pmvmaritime.com",
       linkedin: "https://www.linkedin.com/in/gaurav-chhabra-658948213",
-    }
+    },
   },
   {
     name: "Capt. Duryodhan Tarai",
     role: "Global Head of Offshore & Marine Operations",
-    image: member3,
-    description: "Capt. Duryodhan Tarai is an experienced maritime professional with extensive expertise in offshore operations, vessel management and marine assurance. His career includes command of Dive Support Vessels (DSVs) as Master, followed by senior shore-based assignments with ADNOC Offshore and Saudi Aramco. His experience encompasses complex offshore operations, Dynamic Positioning (DP) trials, vessel inspections, marine and offshore surveys, Marine Warranty Surveys, project risk assessment and regulatory compliance. He brings a strong combination of practical command experience, technical expertise and operational leadership to the organisation.",
+    image: newMember3,
+    description:
+      "Capt. Duryodhan Tarai is an experienced maritime professional with extensive expertise in offshore operations, vessel management and marine assurance. His career includes command of Dive Support Vessels (DSVs) as Master, followed by senior shore-based assignments with ADNOC Offshore and Saudi Aramco. His experience encompasses complex offshore operations, Dynamic Positioning (DP) trials, vessel inspections, marine and offshore surveys, Marine Warranty Surveys, project risk assessment and regulatory compliance. He brings a strong combination of practical command experience, technical expertise and operational leadership to the organisation.",
     expertise: [
       "Offshore & Marine Operations",
       "Vessel Management & Operations",
@@ -89,18 +202,19 @@ const teamMembers = [
       "Marine Warranty Surveys",
       "Vessel Inspection & Compliance",
       "Offshore Project Execution & Risk Assessment",
-      "Marine Safety & Operational Assurance"
+      "Marine Safety & Operational Assurance",
     ],
     socials: {
       email: "info@pmvmaritime.com",
       linkedin: "https://www.linkedin.com/in/capt-duryodhan-tarai-18205068",
-    }
+    },
   },
   {
     name: "Mr. Saswat Ranjan Barik",
     role: "Head - Marine Personnel & Commercial Operations, Nigeria",
-    image: member4,
-    description: "Mr. Saswat Ranjan Barik is an experienced maritime professional, Master Mariner and certified Lead Auditor with nearly two decades of experience across marine operations, crew management, regulatory compliance, quality assurance, maritime training and commercial operations. His experience combines practical seagoing knowledge with shore-based leadership in India and Nigeria. With expertise in international maritime regulations and quality management systems, he leads marine personnel and commercial operations while supporting regulatory compliance, operational excellence and sustainable business growth within the organisation.",
+    image: newMember4,
+    description:
+      "Mr. Saswat Ranjan Barik is an experienced maritime professional, Master Mariner and certified Lead Auditor with nearly two decades of experience across marine operations, crew management, regulatory compliance, quality assurance, maritime training and commercial operations. His experience combines practical seagoing knowledge with shore-based leadership in India and Nigeria. With expertise in international maritime regulations and quality management systems, he leads marine personnel and commercial operations while supporting regulatory compliance, operational excellence and sustainable business growth within the organisation.",
     expertise: [
       "Marine Personnel & Crew Management",
       "Commercial & Marine Operations",
@@ -111,17 +225,18 @@ const teamMembers = [
       "ISM, ISPS & MARPOL Compliance",
       "Maritime Training & Accreditation",
       "Port & Marine Operations",
-      "Business Development & Operational Strategy"
+      "Business Development & Operational Strategy",
     ],
     socials: {
-      email: "saswat@pmvmaritime.com"
-    }
+      email: "saswat@pmvmaritime.com",
+    },
   },
   {
     name: "Capt. Iftikhar Khan",
     role: "Maritime Security & Commercial Operations - UK",
-    image: member5,
-    description: "Capt. Iftikhar Khan is an accomplished maritime professional and Master Mariner with extensive international experience across ship operations, commercial shipping, maritime security and business development. Combining a strong seafaring background with senior shore-based leadership, his expertise spans voyage management, marine operations, security and risk management, commercial development and maritime education. His operational knowledge and leadership experience support the organisation's commitment to safe, secure and efficient maritime services and sustainable business growth.",
+    image: newMember5,
+    description:
+      "Capt. Iftikhar Khan is an accomplished maritime professional and Master Mariner with extensive international experience across ship operations, commercial shipping, maritime security and business development. Combining a strong seafaring background with senior shore-based leadership, his expertise spans voyage management, marine operations, security and risk management, commercial development and maritime education. His operational knowledge and leadership experience support the organisation's commitment to safe, secure and efficient maritime services and sustainable business growth.",
     expertise: [
       "Maritime Security & Risk Management",
       "Commercial Shipping Operations",
@@ -130,11 +245,96 @@ const teamMembers = [
       "Business Development",
       "Maritime Safety & Operational Management",
       "Maritime Education",
-      "Strategic Leadership"
+      "Strategic Leadership",
     ],
     socials: {
-      email: "info@pmvmaritime.com"
-    }
+      email: "info@pmvmaritime.com",
+    },
+  },
+  {
+    name: "Okeowo Uthman Olorunfemi",
+    role: "Simulator Manager & Technical Head",
+    image: newMember6,
+    description:
+      "Okeowo Uthman Olorunfemi is an experienced maritime simulation and technical professional responsible for the operation, maintenance, installation and continuous improvement of training simulator systems. As Simulator Manager & Technical Head at PMV Maritime Solutions, he also leads the technical functions covering IT, power systems and networking. Certified across the organisation's simulator platforms, he has received technical training from leading maritime simulation technology providers, including Wärtsilä Voyage, ARI Simulation and MEVEA Simulation. Combining specialised technical training with extensive hands-on experience, he plays a key role in maintaining reliable, efficient and high-quality simulation and technology infrastructure for maritime training.",
+    expertise: [
+      "Maritime Simulation Systems",
+      "Simulator Installation, Operation & Maintenance",
+      "Simulator System Integration",
+      "IT Infrastructure & Technical Support",
+      "Networking & Systems Management",
+      "Power Systems & Technical Operations",
+      "Preventive Maintenance & Troubleshooting",
+      "Technical Training & System Support",
+    ],
+    socials: {
+      email: "info@pmvmaritime.com",
+    },
+  },
+  {
+    name: "Anjolaoluwa Odukoya",
+    role: "Human Resources & Organisational Development",
+    image: newMember7,
+    description:
+      "Anjolaoluwa Odukoya is a Human Resources professional with expertise in HR management, talent acquisition, employee relations and organisational development. A graduate of Industrial Relations and Human Resources Management from Covenant University, Anjolaoluwa brings a people-focused approach to developing HR strategies, strengthening employee engagement and supporting workforce effectiveness and organisational growth.",
+    expertise: [
+      "Human Resources Management",
+      "Talent Acquisition & Recruitment",
+      "Employee Relations",
+      "Organisational Development",
+      "Performance & Workforce Management",
+      "People Management Strategies",
+      "Employee Engagement",
+      "HR Policy & Administration",
+    ],
+    socials: {
+      email: "info@pmvmaritime.com",
+    },
+  },
+  {
+    name: "Chief Engr. Patrick Lumumba Dery",
+    role: "Principal - Lagos Maritime Academy | Technical Advisor",
+    image: newMember8,
+    description:
+      "Chief Engr. Patrick Lumumba Dery is a distinguished marine engineer, maritime educator and technical leader with over 30 years of international experience across marine engineering, offshore operations, maritime safety, regulatory compliance and training. A Class I Marine Engineer (Unlimited), he has served as Chief Marine Engineer with Tidewater Marine International, Marine Surveyor with the Ghana Maritime Authority and Acting Chief Examiner. His background includes competency assessments, offshore vessel operations, Dynamic Positioning (DP) systems, drydock management and marine inspections. As Principal of Lagos Maritime Academy, he provides academic and technical leadership in curriculum delivery, cadet training and quality assurance. As Technical Advisor to PMV Maritime Solutions, he supports the organisation's technical activities, marine operations, safety and compliance.",
+    expertise: [
+      "Marine Engineering & Technical Operations",
+      "Maritime Education & Training",
+      "Technical Advisory & Marine Services",
+      "IMO & STCW Regulatory Compliance",
+      "Marine Engineering Competency Assessment",
+      "Offshore Vessel Operations",
+      "Dynamic Positioning (DP) Systems",
+      "Ship Maintenance & Drydock Management",
+      "Marine Surveys & Inspections",
+      "Maritime Safety & Quality Assurance",
+      "Academic & Technical Leadership",
+    ],
+    socials: {
+      email: "info@pmvmaritime.com",
+    },
+  },
+  {
+    name: "Chief Engr. Theodore Ebenezer Kudjoe Mensah",
+    role: "Head of Marine Engineering & Technical Services",
+    image: newMember9,
+    description:
+      "Chief Engr. Theodore Ebenezer Kudjoe Mensah is an accomplished marine engineering professional and maritime educator with extensive international experience across shipboard engineering, shipbuilding, technical management and maritime education. A Class I Marine Engineer (Unlimited), he brings approximately 19 years of active seagoing experience, including service as Chief Engineer. His professional background also includes significant technical and shipbuilding experience, including the supervision of the construction of 31 offshore support vessels. He has further contributed to professional maritime development as a lecturer at Regional Maritime University, Ghana, and as a Certificate of Competency Assessor with the Ghana Maritime Authority. As Head of Marine Engineering & Technical Services at Lagos Maritime Academy, Chief Engr. Mensah provides academic and technical leadership for marine engineering training while supporting the Academy's technical activities. His experience in marine engineering, shipbuilding and technical management enables him to strengthen practical training, technical standards, equipment-related activities and industry-aligned professional development. His combination of seagoing experience, engineering leadership, shipbuilding expertise and maritime education supports the Academy's commitment to developing technically competent, safety-conscious and internationally competitive maritime professionals.",
+    expertise: [
+      "Marine Engineering & Technical Services",
+      "Shipboard Engineering & Operations",
+      "Shipbuilding & New-Build Supervision",
+      "Technical Management",
+      "Offshore Support Vessels",
+      "Marine Engineering Education & Training",
+      "Certificate of Competency Assessment",
+      "Ship Maintenance & Engineering Systems",
+      "Maritime Safety & Regulatory Compliance",
+      "Practical Training & Technical Mentorship",
+    ],
+    socials: {
+      email: "info@pmvmaritime.com",
+    },
   },
 ];
 
@@ -375,7 +575,7 @@ export default function About() {
             {/* Close Button */}
             <button
               onClick={closeModal}
-              className="absolute top-3.5 right-3.5 z-30 p-2 rounded-none bg-white/90 hover:bg-primary text-gray-700 hover:text-white border border-gray-200/80 hover:border-primary transition-all duration-200 cursor-pointer shadow-sm"
+              className="absolute top-3.5 right-10.5 z-30 p-2 rounded-none bg-white/90 hover:bg-primary text-gray-700 hover:text-white border border-gray-200/80 hover:border-primary transition-all duration-200 cursor-pointer shadow-sm"
               aria-label="Close modal"
             >
               <X size={18} />
@@ -383,11 +583,11 @@ export default function About() {
 
             {/* Modal Content Row */}
             {selectedMember && (
-              <div className="flex flex-col md:flex-row max-h-[88vh] md:max-h-[640px] overflow-y-auto md:overflow-hidden">
+              <div className="flex flex-col md:flex-row max-h-[88vh] md:max-h-[580px] overflow-y-auto md:overflow-hidden">
                 {/* Left Side: Executive Portrait & Direct Contact Panel */}
                 <div className="w-full md:w-[330px] lg:w-[360px] bg-slate-50 border-b md:border-b-0 md:border-r border-gray-200 flex flex-col shrink-0">
                   {/* Portrait Showcase with Seamless Bottom Dissolve */}
-                  <div className="relative h-[280px] sm:h-[310px] md:h-[330px] bg-gradient-to-b from-slate-200 via-neutral-100 to-slate-50 flex items-end justify-center overflow-hidden shrink-0">
+                  <div className="relative h-[220px] sm:h-[240px] md:h-[270px] bg-gradient-to-b from-slate-200 via-neutral-100 to-slate-50 flex items-end justify-center overflow-hidden shrink-0">
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(0,123,167,0.14),transparent_70%)] pointer-events-none" />
 
                     {/* Cutout Image */}
@@ -398,7 +598,7 @@ export default function About() {
                         className="h-[95%] scale-108 sm:-translate-y-4 w-auto max-w-full object-contain object-bottom relative z-10 drop-shadow-[0_8px_16px_rgba(0,0,0,0.12)]"
                         priority
                       />
-                    </div>  
+                    </div>
 
                     {/* Smooth Bottom Dissolve Gradient (Eliminates the harsh torso cutoff line) */}
                     <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-50 via-slate-50/80 to-transparent z-15 pointer-events-none" />
