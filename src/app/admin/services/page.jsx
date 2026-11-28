@@ -437,6 +437,50 @@ export default function AdminServicesPage() {
               </div>
             )}
 
+            {Array.isArray(service.deliverySteps) && service.deliverySteps.length > 0 && (
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">
+                  How We Deliver ({service.deliverySteps.length} Steps)
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-50 p-3 border border-gray-200">
+                  {service.deliverySteps.map((step, idx) => (
+                    <div key={idx} className="flex items-start gap-2 bg-white p-2 border border-gray-100">
+                      <div className="w-6 h-6 bg-primary text-white text-[10px] flex items-center justify-center shrink-0 font-bold">
+                        {renderIconById(step.icon, "h-3.5 w-3.5")}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-gray-800 truncate">
+                          {idx + 1}. {step.title}
+                        </p>
+                        <p className="text-[11px] text-gray-500 line-clamp-1">{step.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {Array.isArray(service.serviceStandards) && service.serviceStandards.length > 0 && (
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">
+                  Service Standards ({service.serviceStandards.length} Pillars)
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-50 p-3 border border-gray-200">
+                  {service.serviceStandards.map((std, idx) => (
+                    <div key={idx} className="flex items-start gap-2 bg-white p-2 border border-gray-100">
+                      <div className="w-6 h-6 bg-secondary text-white text-[10px] flex items-center justify-center shrink-0 font-bold">
+                        {renderIconById(std.icon, "h-3.5 w-3.5")}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-gray-800 truncate">{std.title}</p>
+                        <p className="text-[11px] text-gray-500 line-clamp-1">{std.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Brochure PDF Link */}
             <div>
               <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1">

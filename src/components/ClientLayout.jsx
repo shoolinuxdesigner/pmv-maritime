@@ -32,6 +32,13 @@ export default function ClientLayout({ children, maintenanceMode, showLoader }) 
             if (!isEnabled) {
               setShowMaintenance(false);
               setTimeLeft("");
+            } else {
+              const bypassExpiry = localStorage.getItem("maintenance_bypass_expiry");
+              if (bypassExpiry && parseInt(bypassExpiry, 10) > Date.now()) {
+                setShowMaintenance(false);
+              } else {
+                setShowMaintenance(true);
+              }
             }
           }
         }

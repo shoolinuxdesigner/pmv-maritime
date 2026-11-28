@@ -25,6 +25,8 @@ export async function GET(request) {
       ...item,
       _id: item._id.toString(),
       id: item._id.toString(),
+      createdBy: item.createdBy || "Super Administrator",
+      updatedBy: item.updatedBy || (item.updatedAt ? "Super Administrator" : null),
     }));
 
     return NextResponse.json(formattedData);
@@ -58,18 +60,20 @@ export async function POST(request) {
     );
     const nextOrder = (lastRecord?.order || 0) + 1;
 
+    const performedBy = getPerformedBy(request);
+
     const newRecord = {
       module: targetModule.trim(),
       name: name.trim(),
       status: status ? status.trim() : "Active",
       order: nextOrder,
+      createdBy: performedBy,
       createdAt: new Date().toISOString(),
     };
 
     const result = await db.collection("masters").insertOne(newRecord);
 
     // Create Notification
-    const performedBy = getPerformedBy(request);
     await db.collection("notifications").insertOne({
       title: "Master Category Created",
       message: `Master category "${name.trim()}" under module "${targetModule.trim()}" was created by ${performedBy}.`,
@@ -114,10 +118,12 @@ export async function PUT(request) {
       .collection("masters")
       .findOne({ _id: new ObjectId(id) });
 
+    const performedBy = getPerformedBy(request);
     const newName = name.trim();
     const updateData = {
       name: newName,
       status: status ? status.trim() : "Active",
+      updatedBy: performedBy,
       updatedAt: new Date().toISOString(),
     };
 
@@ -148,7 +154,6 @@ export async function PUT(request) {
     }
 
     // Create Notification
-    const performedBy = getPerformedBy(request);
     await db.collection("notifications").insertOne({
       title: "Master Category Updated",
       message: `Master category "${newName}" was updated by ${performedBy}.`,

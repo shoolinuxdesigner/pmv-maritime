@@ -505,7 +505,7 @@ export default function DataTable({
               ) : (
                 /* Generic Key-Value Fallback for Any Record */
                 Object.entries(selectedRowDetail)
-                  .filter(([key]) => key !== "_id" && key !== "__v")
+                  .filter(([key]) => key !== "_id" && key !== "__v" && key.toLowerCase() !== "id")
                   .map(([key, val]) => (
                     <div key={key}>
                       <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1">

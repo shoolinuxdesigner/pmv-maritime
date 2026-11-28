@@ -1,5 +1,4 @@
 import clientPromise from "@/lib/mongodb";
-import { unstable_cache, revalidateTag } from "next/cache";
 
 const DEFAULT_MAINTENANCE_SETTING = {
   key: "maintenance_mode",
@@ -34,17 +33,10 @@ async function fetchMaintenanceDataFromDB() {
   }
 }
 
-// Cached server lookup (0ms memory overhead for visitors)
-export const getMaintenanceStatus = unstable_cache(
-  async () => {
-    return await fetchMaintenanceDataFromDB();
-  },
-  ["maintenance_mode_cache"],
-  {
-    tags: ["maintenance_mode"],
-    revalidate: 60,
-  }
-);
+// Direct live server lookup from DB (always synchronized across local & live stages)
+export async function getMaintenanceStatus() {
+  return await fetchMaintenanceDataFromDB();
+}
 
 export async function setMaintenanceStatus(isEnabled, bypassPasswords, performedBy = "Admin") {
   try {
@@ -68,20 +60,17 @@ export async function setMaintenanceStatus(isEnabled, bypassPasswords, performed
     );
 
     // Notify activity center
-    await db.collection("notifications").insertOne({
-      title: "Maintenance Mode Toggled",
-      message: `System Maintenance Mode was turned ${isEnabled ? "ON" : "OFF"} by ${performedBy}.`,
-      category: "System",
-      targetRole: "ALL",
-      isRead: false,
-      createdAt: new Date().toISOString(),
-    });
-
-    // Invalidate server cache instantly
     try {
-      revalidateTag("maintenance_mode");
-    } catch (e) {
-      console.log("revalidateTag note:", e.message);
+      await db.collection("notifications").insertOne({
+        title: "Maintenance Mode Toggled",
+        message: `System Maintenance Mode was turned ${isEnabled ? "ON" : "OFF"} by ${performedBy}.`,
+        category: "System",
+        targetRole: "ALL",
+        isRead: false,
+        createdAt: new Date().toISOString(),
+      });
+    } catch (notifErr) {
+      console.warn("Could not insert notification log:", notifErr.message);
     }
 
     return { success: true, isEnabled: Boolean(isEnabled) };
@@ -96,4 +85,5 @@ export function checkMaintenanceBypass(bypassCookie) {
   const expiry = parseInt(bypassCookie.value, 10);
   return Number.isFinite(expiry) && Date.now() < expiry;
 }
+
 

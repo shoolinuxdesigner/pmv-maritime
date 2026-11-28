@@ -16,7 +16,10 @@ import {
   LuPlus,
   LuCheck,
   LuWrench,
+  LuUser,
+  LuCalendar,
 } from "react-icons/lu";
+import { getCurrentUserSession } from "@/lib/permissions";
 
 export default function MasterPage() {
   const [activeTab, setActiveTab] = useState("services");
@@ -307,11 +310,21 @@ export default function MasterPage() {
     setIsSubmitting(true);
 
     try {
+      const sessionUser = getCurrentUserSession();
+      const performer =
+        sessionUser?.fullName ||
+        sessionUser?.name ||
+        sessionUser?.username ||
+        "Super Administrator";
+
       if (editingId) {
         // Update item in MongoDB
         const res = await fetch("/api/master", {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-performed-by": encodeURIComponent(performer),
+          },
           body: JSON.stringify({
             id: editingId,
             name: name.trim(),
@@ -324,11 +337,18 @@ export default function MasterPage() {
           throw new Error(errData?.error || "Failed to update record.");
         }
 
+        const nowIso = new Date().toISOString();
         setMasterData((prev) => ({
           ...prev,
           [activeTab]: prev[activeTab].map((item) =>
             (item._id || item.id) === editingId
-              ? { ...item, name: name.trim(), status }
+              ? {
+                ...item,
+                name: name.trim(),
+                status,
+                updatedBy: performer,
+                updatedAt: nowIso,
+              }
               : item
           ),
         }));
@@ -337,7 +357,10 @@ export default function MasterPage() {
         // Add new item to MongoDB
         const res = await fetch("/api/master", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-performed-by": encodeURIComponent(performer),
+          },
           body: JSON.stringify({
             module: activeTab,
             name: name.trim(),
@@ -517,6 +540,144 @@ export default function MasterPage() {
     },
   ];
 
+  const formatDateTime = (dateStr) => {
+    if (!dateStr) return null;
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return null;
+    return d.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
+  const renderMasterDrawerDetail = (row) => {
+    if (!row) return null;
+
+    const moduleConfig = tabConfig.find((t) => t.key === (row.module || activeTab));
+    const moduleLabel =
+      moduleConfig?.label ||
+      (row.module ? `${row.module.charAt(0).toUpperCase()}${row.module.slice(1)} Master` : "Master");
+    const ModuleIcon = moduleConfig?.icon || LuFolderOpen;
+
+    const createdByName = row.createdBy || "Super Administrator";
+    const createdDateFormatted = formatDateTime(row.createdAt);
+
+    const updatedByName = row.updatedBy || (row.updatedAt ? (row.createdBy || "Super Administrator") : null);
+    const updatedDateFormatted = formatDateTime(row.updatedAt);
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1.5">
+            Category Name
+          </label>
+          <div className="bg-slate-50 border border-gray-200 p-3.5">
+            <p className="text-base font-bold text-secondary-dark leading-snug">
+              {row.name}
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1.5">
+            Master Section
+          </label>
+          <div className="bg-slate-50 border border-gray-200 p-3 flex items-center gap-2">
+            <ModuleIcon className="text-secondary text-base shrink-0" />
+            <span className="text-xs font-bold text-secondary uppercase tracking-wider">
+              {moduleLabel}
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1.5">
+            Status
+          </label>
+          <div className="bg-slate-50 border border-gray-200 p-3">
+            <span
+              className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold uppercase ${row.status === "Active"
+                  ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                  : "bg-gray-100 text-gray-700 border border-gray-200"
+                }`}
+            >
+              <span
+                className={`w-2 h-2 rounded-full ${row.status === "Active" ? "bg-emerald-500" : "bg-gray-400"
+                  }`}
+              />
+              {row.status || "Active"}
+            </span>
+          </div>
+        </div>
+
+        {typeof row.order === "number" && (
+          <div>
+            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1.5">
+              Sequence Order
+            </label>
+            <div className="bg-slate-50 border border-gray-200 p-3">
+              <span className="text-xs font-bold text-gray-700 font-mono">
+                #{row.order}
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div>
+          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1.5">
+            Created By
+          </label>
+          <div className="bg-slate-50 border border-gray-200 p-3.5 space-y-1.5">
+            <div className="flex items-center gap-2">
+              <LuUser className="text-primary text-sm shrink-0" />
+              <span className="text-sm font-bold text-gray-900">
+                {createdByName}
+              </span>
+            </div>
+            {createdDateFormatted ? (
+              <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium pl-5">
+                <LuCalendar className="text-xs text-gray-400 shrink-0" />
+                <span>{createdDateFormatted}</span>
+              </div>
+            ) : (
+              <p className="text-xs text-gray-400 font-medium pl-5 italic">Initial Setup</p>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1.5">
+            Updated By
+          </label>
+          <div className="bg-slate-50 border border-gray-200 p-3.5 space-y-1.5">
+            {updatedByName || updatedDateFormatted ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <LuUser className="text-secondary text-sm shrink-0" />
+                  <span className="text-sm font-bold text-gray-900">
+                    {updatedByName || "Super Administrator"}
+                  </span>
+                </div>
+                {updatedDateFormatted && (
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium pl-5">
+                    <LuCalendar className="text-xs text-gray-400 shrink-0" />
+                    <span>{updatedDateFormatted}</span>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-xs text-gray-400 italic">Not updated yet</p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="p-3 md:p-5 space-y-5">
       {/* ═══════════════════════════════════════════════════
@@ -606,7 +767,7 @@ export default function MasterPage() {
                       type="text"
                       value={bypassFormLabel}
                       onChange={(e) => setBypassFormLabel(e.target.value)}
-                      placeholder="e.g. Samir Admin Access"
+                      placeholder="e.g. Admin Access"
                       className="w-full bg-slate-50 border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none px-4 py-2.5 text-sm text-gray-900 font-medium placeholder-gray-400"
                       required
                     />
@@ -621,7 +782,7 @@ export default function MasterPage() {
                       type="text"
                       value={bypassFormPassword}
                       onChange={(e) => setBypassFormPassword(e.target.value)}
-                      placeholder="e.g. samir@2026"
+                      placeholder="e.g. something@0000"
                       className="w-full bg-slate-50 border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none px-4 py-2.5 text-sm font-mono font-bold text-gray-900 placeholder-gray-400"
                       required
                     />
@@ -849,6 +1010,8 @@ export default function MasterPage() {
               onSaveOrder={handleSaveOrder}
               onReorder={handleSaveOrder}
               title={`${tabConfig.find((t) => t.key === activeTab)?.label || "Master Records"}`}
+              detailTitle={`${tabConfig.find((t) => t.key === activeTab)?.label || "Master Category"} Details`}
+              renderDrawerDetail={renderMasterDrawerDetail}
               searchPlaceholder="Search records by name..."
               exportFilename={`${activeTab}_master_export.csv`}
             />

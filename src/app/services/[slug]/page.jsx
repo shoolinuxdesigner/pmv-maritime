@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import SubBanner from "@/components/Sub Banner/page";
 import SubHeading from "@/design/sub-heading/page";
-import { renderIconById } from "@/lib/maritimeIcons";
+import { renderIconById, DEFAULT_DELIVERY_STEPS, DEFAULT_SERVICE_STANDARDS } from "@/lib/maritimeIcons";
 
 // Images
 import bannerBg from "../../../../public/assets/images/map-bg.png";
@@ -54,27 +54,14 @@ import ContactUs from "@/components/Contact Us/page";
 import toast from "react-hot-toast";
 import { getDirectDownloadUrl } from "@/lib/utils";
 
-// ─── STATIC SECTIONS (same for every service) ────────────────────────────────
-
-const deliverySteps = [
-  { step: "1", title: "Discover", description: "We define project scope, timelines, and expected outcomes.", icon: TbSearch },
-  { step: "2", title: "Assess", description: "We assess requirements and identify technical priorities.", icon: TbChartBar },
-  { step: "3", title: "Plan", description: "We create a delivery plan with milestones and risk controls.", icon: TbCalendar },
-  { step: "4", title: "Execute", description: "We execute with experienced teams and strong coordination.", icon: TbUsers },
-  { step: "5", title: "Verify", description: "We monitor quality, compliance, progress, and performance.", icon: TbShieldCheck },
-  { step: "6", title: "Report & Improve", description: "We report results and improve through continuous feedback.", icon: TbActivity },
-];
-
-const serviceStandards = [
-  { title: "Quality", description: "Professional, technical, and operational standards applied to every assignment.", icon: TbCompass },
-  { title: "Safety", description: "Protection of people, vessels, cargo, assets, and the environment.", icon: TbShieldCheck },
-  { title: "Compliance", description: "Support for statutory, regulatory, classification, and industry requirements.", icon: TbUserCheck },
-  { title: "Accountability", description: "Clear responsibilities and ownership at every stage.", icon: TbShip },
-  { title: "Transparency", description: "Open communication and accurate reporting.", icon: TbEye },
-  { title: "Commercial Value", description: "Solutions that reduce risk, improve efficiency, control costs, and performance.", icon: TbTrendingUp },
-  { title: "Timely Execution", description: "Careful planning and a strong focus on agreed deadlines.", icon: LuShipWheel },
-  { title: "Reliability", description: "Consistent support and dependable delivery.", icon: TbAward },
-];
+// ─── ICON HELPER ─────────────────────────────────────────────────────────────
+const renderStepIcon = (icon, className = "h-5 w-5") => {
+  if (typeof icon === "function") {
+    const IconComp = icon;
+    return <IconComp className={className} />;
+  }
+  return renderIconById(icon, className);
+};
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
@@ -84,6 +71,17 @@ export default function ServiceDetailPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [activeStepIdx, setActiveStepIdx] = useState(0);
+
+  // Dynamic delivery steps & standards with fallbacks
+  const deliverySteps =
+    Array.isArray(service?.deliverySteps) && service.deliverySteps.length > 0
+      ? service.deliverySteps
+      : DEFAULT_DELIVERY_STEPS;
+
+  const serviceStandards =
+    Array.isArray(service?.serviceStandards) && service.serviceStandards.length > 0
+      ? service.serviceStandards
+      : DEFAULT_SERVICE_STANDARDS;
 
   // ── Brochure Download & OTP State ──────────────────────────────────────────
   const [isBrochureModalOpen, setIsBrochureModalOpen] = useState(false);
@@ -454,7 +452,7 @@ export default function ServiceDetailPage() {
               <div className="shrink-0 w-12 h-12 md:w-14 md:h-14 bg-[#ffedf1] flex items-center justify-center">
                 {renderIconById(service.icon, "h-6 w-6 md:h-7 md:w-7 text-primary")}
               </div>
-              <p className="max-w-[799px] text-base md:text-[17px] leading-relaxed md:leading-[26px] text-gray-800 font-medium">
+              <p className="text-base md:text-[16px] leading-relaxed md:leading-[26px] text-gray-800 font-medium">
                 {service.longDesc || service.shortDesc}
               </p>
             </div>
@@ -504,7 +502,7 @@ export default function ServiceDetailPage() {
         </div>
       </section>
 
-      {/* ── HOW WE DELIVER (static) ──────────────────────────────────────────── */}
+      {/* ── HOW WE DELIVER (dynamic) ─────────────────────────────────────────── */}
       <section className="container max-w-7xl mx-auto">
         <div className="bg-white md:border-x md:border-b border-gray-200">
           <div className="flex items-center py-3 px-4 md:px-8">
@@ -515,11 +513,10 @@ export default function ServiceDetailPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 bg-white border-t border-gray-200">
             {deliverySteps.map((step, idx) => {
-              const StepIcon = step.icon;
               const isActive = idx === activeStepIdx;
               return (
                 <article
-                  key={step.title}
+                  key={step.title || idx}
                   onClick={() => setActiveStepIdx(idx)}
                   className={`relative flex flex-row md:flex-col items-center overflow-hidden border-b sm:border-b-0 lg:border-b-0 lg:border-r border-gray-200 last:border-r-0 pt-0 md:pt-6 cursor-pointer transition-all duration-300 ${isActive ? "bg-primary text-white" : "bg-white text-secondary-dark"
                     }`}
@@ -539,8 +536,12 @@ export default function ServiceDetailPage() {
                     />
                   </div>
                   <div className="relative md:min-h-[80px] z-2 shrink-0 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center">
-                    <StepIcon className={`absolute h-6 w-6 md:h-12 md:w-12 transition-all duration-500 ease-in-out ${isActive ? "opacity-0 scale-90 pointer-events-none text-white" : "opacity-100 scale-100 text-secondary-dark"}`} />
-                    <p className={`absolute text-4xl font-semibold font-oswald flex justify-center items-center w-10 transition-all duration-500 ease-in-out ${isActive ? "opacity-100 scale-100" : "opacity-0 scale-90 pointer-events-none"}`}>{step.step}</p>
+                    {renderStepIcon(
+                      step.icon,
+                      `absolute h-6 w-6 md:h-12 md:w-12 transition-all duration-500 ease-in-out ${isActive ? "opacity-0 scale-90 pointer-events-none text-white" : "opacity-100 scale-100 text-secondary-dark"
+                      }`
+                    )}
+                    <p className={`absolute text-4xl font-semibold font-oswald flex justify-center items-center w-10 transition-all duration-500 ease-in-out ${isActive ? "opacity-100 scale-100" : "opacity-0 scale-90 pointer-events-none"}`}>{step.step || String(idx + 1)}</p>
                   </div>
                   <div className={`relative z-[1] mt-0 md:mt-5 flex w-full flex-1 flex-col items-center gap-1.5 border-l md:border-l-0 md:border-t border-gray-200 px-3.5 pb-5 pt-3 text-center transition-colors duration-500 ease-in-out ${isActive ? "bg-[#fff3f6]" : "bg-[#f8fafc]"}`}>
                     <h3 className={`w-full text-base md:text-[17px] font-bold transition-colors duration-500 ${isActive ? "text-primary" : "text-secondary-dark"}`}>{step.title}</h3>
@@ -552,7 +553,7 @@ export default function ServiceDetailPage() {
           </div>
         </div>
 
-        {/* ── OUR SERVICE STANDARDS (static) ──────────────────────────────────── */}
+        {/* ── OUR SERVICE STANDARDS (dynamic) ─────────────────────────────────── */}
         <div className="bg-white border-x border-b border-gray-200">
           <div className="flex items-center border-b border-gray-200 py-3 px-4 md:px-8">
             <h2 className="text-lg md:text-xl font-bold font-oswald text-secondary uppercase tracking-wide">
@@ -560,16 +561,15 @@ export default function ServiceDetailPage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
-            {serviceStandards.map((standard) => {
-              const StandardIcon = standard.icon;
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
+            {serviceStandards.map((standard, idx) => {
               return (
                 <article
-                  key={standard.title}
+                  key={standard.title || idx}
                   className="flex min-h-[140px] items-start gap-4 border-r border-b border-gray-200 bg-white p-5 md:p-6"
                 >
                   <div className="shrink-0 w-12 h-12 md:w-14 md:h-14 bg-primary/5 text-primary flex items-center justify-center">
-                    <StandardIcon className="h-6 w-6 md:h-7 md:w-7" />
+                    {renderStepIcon(standard.icon, "h-6 w-6 md:h-7 md:w-7")}
                   </div>
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <h3 className="w-full text-base md:text-[17px] font-bold text-gray-900">{standard.title}</h3>

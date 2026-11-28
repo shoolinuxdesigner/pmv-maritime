@@ -76,7 +76,7 @@ export default function Maintenance() {
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
-          backgroundImage: `url(${bannerAnchor.src})`,
+          backgroundImage: `url(${bannerAnchor?.src || (typeof bannerAnchor === "string" ? bannerAnchor : "/assets/images/banner-anchor.png")})`,
           backgroundSize: "50px",
           backgroundRepeat: "repeat",
         }}
@@ -109,7 +109,13 @@ export default function Maintenance() {
 
         {/* Logo */}
         <div className="flex items-center gap-3 mb-10">
-          <Image src={logo} alt="PMV Maritime Solutions Logo" className="w-14 h-20 object-contain" />
+          <Image
+            src={logo || "/assets/images/logo-light.png"}
+            alt="PMV Maritime Solutions Logo"
+            className="w-14 h-20 object-contain cursor-pointer"
+            onClick={() => setShowModal(true)}
+            title="Administrator Access"
+          />
           <div className="flex flex-col text-left">
             <h3 className="font-oswald text-2xl md:text-3xl font-bold text-white tracking-wide leading-none">
               <span className="text-sky-100">PMV</span> Maritime <br />
@@ -151,9 +157,17 @@ export default function Maintenance() {
         </div>
 
         {/* Bottom copyright */}
-        <p className="text-white/30 text-xs mt-12 font-medium">
-          &copy; {new Date().getFullYear()} PMV Maritime Solutions. All rights reserved.
-        </p>
+        <div className="text-white/30 text-xs mt-12 font-medium flex items-center justify-center gap-1.5">
+          <span>&copy; {new Date().getFullYear()} PMV Maritime Solutions. All rights reserved.</span>
+          <button
+            type="button"
+            onClick={() => setShowModal(true)}
+            className="text-white/20 hover:text-white/60 transition-colors p-1 cursor-pointer"
+            title="Administrator Bypass (Ctrl + Alt + K)"
+          >
+            <LuLock className="text-xs" />
+          </button>
+        </div>
       </div>
 
       {/* Password Prompt Modal */}

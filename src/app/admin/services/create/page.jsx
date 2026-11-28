@@ -16,7 +16,12 @@ import {
   LuExternalLink,
 } from "react-icons/lu";
 
-import { PRESET_ICONS, renderIconById } from "@/lib/maritimeIcons";
+import {
+  PRESET_ICONS,
+  renderIconById,
+  DEFAULT_DELIVERY_STEPS,
+  DEFAULT_SERVICE_STANDARDS,
+} from "@/lib/maritimeIcons";
 import { hasPermission } from "@/lib/permissions";
 
 const DEFAULT_HIGHLIGHTS = [
@@ -56,6 +61,8 @@ export default function CreateServicePage() {
   const [promiseText, setPromiseText] = useState("");
   const [brochureUrl, setBrochureUrl] = useState("");
   const [highlights, setHighlights] = useState(DEFAULT_HIGHLIGHTS);
+  const [deliverySteps, setDeliverySteps] = useState(DEFAULT_DELIVERY_STEPS);
+  const [serviceStandards, setServiceStandards] = useState(DEFAULT_SERVICE_STANDARDS);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFetchingEdit, setIsFetchingEdit] = useState(false);
 
@@ -106,6 +113,16 @@ export default function CreateServicePage() {
             ? data.highlights
             : DEFAULT_HIGHLIGHTS
         );
+        setDeliverySteps(
+          Array.isArray(data.deliverySteps) && data.deliverySteps.length === 6
+            ? data.deliverySteps
+            : DEFAULT_DELIVERY_STEPS
+        );
+        setServiceStandards(
+          Array.isArray(data.serviceStandards) && data.serviceStandards.length === 6
+            ? data.serviceStandards
+            : DEFAULT_SERVICE_STANDARDS
+        );
       } catch (err) {
         toast.error("Could not load service for editing.");
       } finally {
@@ -124,7 +141,23 @@ export default function CreateServicePage() {
     });
   };
 
-  // Icon Modal Selector State: target can be "main" | 0 | 1 | 2
+  const handleDeliveryStepChange = (index, field, value) => {
+    setDeliverySteps((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  const handleServiceStandardChange = (index, field, value) => {
+    setServiceStandards((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  // Icon Modal Selector State: target can be "main" | 0 | 1 | 2 | { type: "deliveryStep", index } | { type: "serviceStandard", index }
   const [iconModalTarget, setIconModalTarget] = useState(null);
   const [iconSearchQuery, setIconSearchQuery] = useState("");
 
@@ -138,6 +171,10 @@ export default function CreateServicePage() {
       setSelectedIcon(iconId);
     } else if (typeof iconModalTarget === "number") {
       handleHighlightChange(iconModalTarget, "icon", iconId);
+    } else if (iconModalTarget?.type === "deliveryStep") {
+      handleDeliveryStepChange(iconModalTarget.index, "icon", iconId);
+    } else if (iconModalTarget?.type === "serviceStandard") {
+      handleServiceStandardChange(iconModalTarget.index, "icon", iconId);
     }
     setIconModalTarget(null);
     toast.success("Icon updated successfully!");
@@ -209,6 +246,38 @@ export default function CreateServicePage() {
       return;
     }
 
+    for (let i = 0; i < deliverySteps.length; i++) {
+      const step = deliverySteps[i];
+      if (!step.title?.trim()) {
+        toast.error(`Please enter a Heading for Delivery Step #${i + 1}.`);
+        return;
+      }
+      if (!step.description?.trim()) {
+        toast.error(`Please enter a Description for Delivery Step #${i + 1}.`);
+        return;
+      }
+      if (!step.icon) {
+        toast.error(`Please select an Icon for Delivery Step #${i + 1}.`);
+        return;
+      }
+    }
+
+    for (let i = 0; i < serviceStandards.length; i++) {
+      const std = serviceStandards[i];
+      if (!std.title?.trim()) {
+        toast.error(`Please enter a Heading for Service Standard #${i + 1}.`);
+        return;
+      }
+      if (!std.description?.trim()) {
+        toast.error(`Please enter a Description for Service Standard #${i + 1}.`);
+        return;
+      }
+      if (!std.icon) {
+        toast.error(`Please select an Icon for Service Standard #${i + 1}.`);
+        return;
+      }
+    }
+
     setIsSubmitting(true);
 
     const payload = {
@@ -221,6 +290,8 @@ export default function CreateServicePage() {
       deliverables,
       promise: promiseText,
       brochureUrl: brochureUrl.trim(),
+      deliverySteps,
+      serviceStandards,
     };
 
     try {
@@ -504,23 +575,37 @@ export default function CreateServicePage() {
                 key={index}
                 className="bg-slate-50/90 border border-gray-200 p-4 space-y-4 relative flex flex-col justify-between"
               >
-                {/* Card Header & Icon Selector Button */}
-                <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-                  <span className="text-xs font-bold uppercase tracking-wider text-secondary">
+                {/* Card Header */}
+                <div className="flex items-center justify-between border-b border-gray-200 pb-2.5">
+                  <span className="text-xs font-bold font-oswald text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-secondary-dark text-white text-[10px] flex items-center justify-center font-mono">
+                      {index + 1}
+                    </span>
                     Feature Card #{index + 1}
                   </span>
+                  <span className="text-[11px] font-semibold text-gray-400">Pillar</span>
+                </div>
 
+                {/* Card Icon Picker */}
+                <div>
+                  <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest block mb-1">
+                    Card Icon <span className="text-primary">*</span>
+                  </label>
                   <button
                     type="button"
                     onClick={() => openIconModal(index)}
-                    className="px-2.5 py-1 bg-white hover:bg-slate-100 border border-gray-200 flex items-center gap-2 transition-all cursor-pointer group"
-                    title="Change Icon"
+                    className="w-full h-[40px] bg-white hover:bg-slate-100 border border-gray-200 px-3 flex items-center justify-between transition-all cursor-pointer group"
                   >
-                    <div className="w-6 h-6 bg-secondary-dark text-white flex items-center justify-center shrink-0 font-bold">
-                      {renderIconById(pillar.icon, "h-3.5 w-3.5")}
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-7 h-7 bg-primary text-white flex items-center justify-center shrink-0 font-bold">
+                        {renderIconById(pillar.icon, "h-4 w-4")}
+                      </div>
+                      <span className="text-xs font-bold text-gray-800 truncate">
+                        {PRESET_ICONS.find((i) => i.id === pillar.icon)?.name || "Select Icon"}
+                      </span>
                     </div>
-                    <span className="text-[11px] font-bold text-primary group-hover:underline">
-                      Change Icon
+                    <span className="text-[11px] font-bold text-primary group-hover:underline shrink-0">
+                      Change
                     </span>
                   </button>
                 </div>
@@ -532,7 +617,7 @@ export default function CreateServicePage() {
                   </label>
                   <input
                     type="text"
-                    value={pillar.title}
+                    // value={pillar.title}
                     onChange={(e) => handleHighlightChange(index, "title", e.target.value)}
                     placeholder={`Card #${index + 1} Title`}
                     required
@@ -554,7 +639,7 @@ export default function CreateServicePage() {
                     </span>
                   </div>
                   <textarea
-                    value={pillar.description}
+                    // value={pillar.description}
                     maxLength={110}
                     onChange={(e) => handleHighlightChange(index, "description", e.target.value)}
                     placeholder="Short card description (max 110 characters)..."
@@ -612,6 +697,200 @@ export default function CreateServicePage() {
           </div>
         </div>
 
+        {/* SECTION 4: How We Deliver (6 Execution Steps) */}
+        <div className="bg-white border border-gray-200 p-4 md:p-6 shadow-xs space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-200 pb-3.5 gap-2">
+            <div className="flex items-center gap-2.5">
+              <span className="w-7 h-7 bg-primary/10 text-primary text-xs font-bold flex items-center justify-center border border-primary/20">
+                4
+              </span>
+              <div>
+                <h2 className="font-oswald text-base md:text-lg font-bold text-secondary uppercase tracking-wide">
+                  How We Deliver <span className="text-secondary-dark">(6 Steps)</span>
+                </h2>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {deliverySteps.map((step, idx) => (
+              <div
+                key={idx}
+                className="bg-slate-50/70 border border-gray-200 p-4 flex flex-col gap-3.5 relative"
+              >
+                <div className="flex items-center justify-between border-b border-gray-200/80 pb-2.5">
+                  <span className="text-xs font-bold font-oswald text-secondary-dark uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-secondary-dark text-white text-[10px] flex items-center justify-center font-mono">
+                      {idx + 1}
+                    </span>
+                    Step {idx + 1}
+                  </span>
+                  <span className="text-[11px] font-semibold text-gray-400">
+                    Execution Stage
+                  </span>
+                </div>
+
+                {/* Step Icon Picker */}
+                <div>
+                  <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest block mb-1">
+                    Step Icon <span className="text-primary">*</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => openIconModal({ type: "deliveryStep", index: idx })}
+                    className="w-full h-[40px] bg-white hover:bg-slate-100 border border-gray-200 px-3 flex items-center justify-between transition-all cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-7 h-7 bg-primary text-white flex items-center justify-center shrink-0 font-bold">
+                        {renderIconById(step.icon, "h-4 w-4")}
+                      </div>
+                      <span className="text-xs font-bold text-gray-800 truncate">
+                        {PRESET_ICONS.find((i) => i.id === step.icon)?.name || "Select Icon"}
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-bold text-primary group-hover:underline shrink-0">
+                      Change
+                    </span>
+                  </button>
+                </div>
+
+                {/* Step Heading */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                      Heading (1-2 Words) <span className="text-primary">*</span>
+                    </label>
+                    <span className="text-[10px] text-gray-400 font-mono">
+                      {step.title?.length || 0}/25
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    // value={step.title}
+                    onChange={(e) => handleDeliveryStepChange(idx, "title", e.target.value)}
+                    placeholder="e.g. Discover"
+                    maxLength={25}
+                    required
+                    className="w-full bg-white border border-gray-200 focus:border-secondary outline-none px-3 py-2 text-xs font-bold text-gray-900 placeholder-gray-400"
+                  />
+                </div>
+
+                {/* Step Description */}
+                <div className="flex-1 flex flex-col">
+                  <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest block mb-1">
+                    Description <span className="text-primary">*</span>
+                  </label>
+                  <textarea
+                    // value={step.description}
+                    onChange={(e) => handleDeliveryStepChange(idx, "description", e.target.value)}
+                    placeholder="Brief description of this stage..."
+                    rows={2}
+                    required
+                    className="w-full bg-white border border-gray-200 focus:border-secondary outline-none px-3 py-2 text-xs text-gray-800 font-medium resize-none flex-1"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* SECTION 5: Our Service Standards (6 Pillars) */}
+        <div className="bg-white border border-gray-200 p-4 md:p-6 shadow-xs space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-200 pb-3.5 gap-2">
+            <div className="flex items-center gap-2.5">
+              <span className="w-7 h-7 bg-primary/10 text-primary text-xs font-bold flex items-center justify-center border border-primary/20">
+                5
+              </span>
+              <div>
+                <h2 className="font-oswald text-base md:text-lg font-bold text-secondary uppercase tracking-wide">
+                  Our Service Standards <span className="text-secondary-dark">(6 Pillars)</span>
+                </h2>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {serviceStandards.map((std, idx) => (
+              <div
+                key={idx}
+                className="bg-slate-50/70 border border-gray-200 p-4 flex flex-col gap-3.5 relative"
+              >
+                <div className="flex items-center justify-between border-b border-gray-200/80 pb-2.5">
+                  <span className="text-xs font-bold font-oswald text-secondary-dark uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-secondary-dark text-white text-[10px] flex items-center justify-center font-mono">
+                      {idx + 1}
+                    </span>
+                    Standard {idx + 1}
+                  </span>
+                  <span className="text-[11px] font-semibold text-gray-400">
+                    Quality Pillar
+                  </span>
+                </div>
+
+                {/* Standard Icon Picker */}
+                <div>
+                  <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest block mb-1">
+                    Standard Icon <span className="text-primary">*</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => openIconModal({ type: "serviceStandard", index: idx })}
+                    className="w-full h-[40px] bg-white hover:bg-slate-100 border border-gray-200 px-3 flex items-center justify-between transition-all cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-7 h-7 bg-primary text-white flex items-center justify-center shrink-0 font-bold">
+                        {renderIconById(std.icon, "h-4 w-4")}
+                      </div>
+                      <span className="text-xs font-bold text-gray-800 truncate">
+                        {PRESET_ICONS.find((i) => i.id === std.icon)?.name || "Select Icon"}
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-bold text-primary group-hover:underline shrink-0">
+                      Change
+                    </span>
+                  </button>
+                </div>
+
+                {/* Standard Heading */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                      Standard Title <span className="text-primary">*</span>
+                    </label>
+                    <span className="text-[10px] text-gray-400 font-mono">
+                      {std.title?.length || 0}/30
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    // value={std.title}
+                    onChange={(e) => handleServiceStandardChange(idx, "title", e.target.value)}
+                    placeholder="e.g. Quality"
+                    maxLength={30}
+                    required
+                    className="w-full bg-white border border-gray-200 focus:border-secondary outline-none px-3 py-2 text-xs font-bold text-gray-900 placeholder-gray-400"
+                  />
+                </div>
+
+                {/* Standard Description */}
+                <div className="flex-1 flex flex-col">
+                  <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest block mb-1">
+                    Description <span className="text-primary">*</span>
+                  </label>
+                  <textarea
+                    // value={std.description}
+                    onChange={(e) => handleServiceStandardChange(idx, "description", e.target.value)}
+                    placeholder="Commitment description..."
+                    rows={2}
+                    required
+                    className="w-full bg-white border border-gray-200 focus:border-secondary outline-none px-3 py-2 text-xs text-gray-800 font-medium resize-none flex-1"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Bottom Action Footer */}
         <div className="flex items-center justify-end gap-4 pt-2">
           <Link
@@ -650,7 +929,13 @@ export default function CreateServicePage() {
                   Select Icon for{" "}
                   {iconModalTarget === "main"
                     ? "Main Service"
-                    : `Feature Card #${(iconModalTarget || 0) + 1}`}
+                    : typeof iconModalTarget === "number"
+                      ? `Feature Card #${iconModalTarget + 1}`
+                      : iconModalTarget?.type === "deliveryStep"
+                        ? `Delivery Step #${iconModalTarget.index + 1}`
+                        : iconModalTarget?.type === "serviceStandard"
+                          ? `Service Standard #${iconModalTarget.index + 1}`
+                          : ""}
                 </h3>
               </div>
               <button
@@ -662,17 +947,20 @@ export default function CreateServicePage() {
             </div>
 
             {/* Live Search Bar */}
-            <div className="p-4 border-b border-gray-200 bg-white">
-              <div className="relative">
+            <div className="p-4 border-b border-gray-200 bg-white flex items-center gap-3">
+              <div className="relative flex-1">
                 <LuSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
                 <input
                   type="text"
                   value={iconSearchQuery}
                   onChange={(e) => setIconSearchQuery(e.target.value)}
-                  placeholder="Search icons (e.g. Anchor, Ship, Safety, Crew, Port)..."
+                  placeholder={`Search ${PRESET_ICONS.length} maritime icons (e.g. Anchor, Radar, Survey, Safety, Engine, Port)...`}
                   className="w-full bg-slate-50 border border-gray-200 focus:border-secondary outline-none pl-10 pr-4 py-2 text-xs font-semibold text-gray-900 placeholder-gray-400"
                 />
               </div>
+              <span className="text-[11px] font-bold text-gray-400 shrink-0 font-mono">
+                {filteredIcons.length} / {PRESET_ICONS.length}
+              </span>
             </div>
 
             {/* Icon Grid Body */}
@@ -685,7 +973,11 @@ export default function CreateServicePage() {
                       ? selectedIcon === item.id
                       : typeof iconModalTarget === "number"
                         ? highlights[iconModalTarget]?.icon === item.id
-                        : false;
+                        : iconModalTarget?.type === "deliveryStep"
+                          ? deliverySteps[iconModalTarget.index]?.icon === item.id
+                          : iconModalTarget?.type === "serviceStandard"
+                            ? serviceStandards[iconModalTarget.index]?.icon === item.id
+                            : false;
 
                   return (
                     <button

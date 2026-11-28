@@ -3,12 +3,19 @@ import { getMaintenanceStatus, setMaintenanceStatus } from "@/lib/maintenance";
 import { getPerformedBy } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-// GET: Fetch current maintenance mode status and bypass passwords
+// GET: Fetch current maintenance mode status and bypass passwords directly from DB
 export async function GET() {
   try {
     const data = await getMaintenanceStatus();
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    });
   } catch (error) {
     return NextResponse.json(
       { error: `Failed to fetch maintenance mode: ${error.message}` },

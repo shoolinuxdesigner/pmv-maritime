@@ -120,19 +120,25 @@ const jsonLd = {
 };
 
 export default async function RootLayout({ children }) {
-  const maintenanceData = await getMaintenanceStatus();
-  let maintenanceMode = Boolean(maintenanceData?.isEnabled);
+  let maintenanceMode = false;
+  try {
+    const maintenanceData = await getMaintenanceStatus();
+    maintenanceMode = Boolean(maintenanceData?.isEnabled);
 
-  if (maintenanceMode) {
-    try {
-      const cookieStore = await cookies();
-      const bypassCookie = cookieStore.get("maintenance_bypass_expiry");
-      if (checkMaintenanceBypass(bypassCookie)) {
-        maintenanceMode = false;
+    if (maintenanceMode) {
+      try {
+        const cookieStore = await cookies();
+        const bypassCookie = cookieStore.get("maintenance_bypass_expiry");
+        if (checkMaintenanceBypass(bypassCookie)) {
+          maintenanceMode = false;
+        }
+      } catch {
+        // Safe fallback if cookies cannot be accessed during SSR
       }
-    } catch {
-      // Ignore if cookies cannot be accessed
     }
+  } catch (err) {
+    console.error("Maintenance check error in RootLayout:", err);
+    maintenanceMode = false;
   }
 
   return (

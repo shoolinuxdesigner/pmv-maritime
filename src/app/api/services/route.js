@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { getPerformedBy } from "@/lib/permissions";
+import { DEFAULT_DELIVERY_STEPS, DEFAULT_SERVICE_STANDARDS } from "@/lib/maritimeIcons";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,23 @@ function generateSlug(name) {
     .replace(/[^a-z0-9\s-]/g, "")
     .trim()
     .replace(/\s+/g, "-");
+}
+
+function formatServiceRecord(s) {
+  if (!s) return null;
+  return {
+    ...s,
+    _id: s._id.toString(),
+    id: s._id.toString(),
+    deliverySteps:
+      Array.isArray(s.deliverySteps) && s.deliverySteps.length > 0
+        ? s.deliverySteps
+        : DEFAULT_DELIVERY_STEPS,
+    serviceStandards:
+      Array.isArray(s.serviceStandards) && s.serviceStandards.length > 0
+        ? s.serviceStandards
+        : DEFAULT_SERVICE_STANDARDS,
+  };
 }
 
 // ─── GET ────────────────────────────────────────────────────────────────────
@@ -28,14 +46,14 @@ export async function GET(request) {
     if (idParam) {
       const service = await db.collection("services").findOne({ _id: new ObjectId(idParam) });
       if (!service) return NextResponse.json({ error: "Service not found." }, { status: 404 });
-      return NextResponse.json({ ...service, _id: service._id.toString(), id: service._id.toString() });
+      return NextResponse.json(formatServiceRecord(service));
     }
 
     // Single by slug (inner page)
     if (slugParam) {
       const service = await db.collection("services").findOne({ slug: slugParam, archived: false });
       if (!service) return NextResponse.json({ error: "Service not found." }, { status: 404 });
-      return NextResponse.json({ ...service, _id: service._id.toString(), id: service._id.toString() });
+      return NextResponse.json(formatServiceRecord(service));
     }
 
     // Build query
@@ -47,9 +65,7 @@ export async function GET(request) {
       .sort({ order: 1 })
       .toArray();
 
-    return NextResponse.json(
-      services.map((s) => ({ ...s, _id: s._id.toString(), id: s._id.toString() }))
-    );
+    return NextResponse.json(services.map(formatServiceRecord));
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -59,7 +75,19 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { name, category, icon, shortDesc, longDesc, highlights, deliverables, promise, brochureUrl } = body;
+    const {
+      name,
+      category,
+      icon,
+      shortDesc,
+      longDesc,
+      highlights,
+      deliverables,
+      promise,
+      brochureUrl,
+      deliverySteps,
+      serviceStandards,
+    } = body;
 
     if (!name?.trim()) {
       return NextResponse.json({ error: "Service Name is required." }, { status: 400 });
@@ -82,6 +110,14 @@ export async function POST(request) {
       deliverables: Array.isArray(deliverables) ? deliverables : [],
       promise: promise || "",
       brochureUrl: (brochureUrl || "").trim(),
+      deliverySteps:
+        Array.isArray(deliverySteps) && deliverySteps.length > 0
+          ? deliverySteps
+          : DEFAULT_DELIVERY_STEPS,
+      serviceStandards:
+        Array.isArray(serviceStandards) && serviceStandards.length > 0
+          ? serviceStandards
+          : DEFAULT_SERVICE_STANDARDS,
       archived: false,
       order: nextOrder,
       createdAt: new Date().toISOString(),
@@ -103,7 +139,7 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       insertedId: result.insertedId.toString(),
-      data: { ...newService, _id: result.insertedId.toString(), id: result.insertedId.toString() },
+      data: formatServiceRecord({ ...newService, _id: result.insertedId }),
       message: "Service created successfully.",
     });
   } catch (error) {
@@ -115,7 +151,20 @@ export async function POST(request) {
 export async function PUT(request) {
   try {
     const body = await request.json();
-    const { id, name, category, icon, shortDesc, longDesc, highlights, deliverables, promise, brochureUrl } = body;
+    const {
+      id,
+      name,
+      category,
+      icon,
+      shortDesc,
+      longDesc,
+      highlights,
+      deliverables,
+      promise,
+      brochureUrl,
+      deliverySteps,
+      serviceStandards,
+    } = body;
 
     if (!id || !name?.trim()) {
       return NextResponse.json({ error: "ID and Name are required." }, { status: 400 });
@@ -135,6 +184,14 @@ export async function PUT(request) {
       deliverables: Array.isArray(deliverables) ? deliverables : [],
       promise: promise || "",
       brochureUrl: (brochureUrl || "").trim(),
+      deliverySteps:
+        Array.isArray(deliverySteps) && deliverySteps.length > 0
+          ? deliverySteps
+          : DEFAULT_DELIVERY_STEPS,
+      serviceStandards:
+        Array.isArray(serviceStandards) && serviceStandards.length > 0
+          ? serviceStandards
+          : DEFAULT_SERVICE_STANDARDS,
       updatedAt: new Date().toISOString(),
     };
 
